@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Extractor</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #333; }
+        input[type="file"] { margin: 10px 0; }
+        button { padding: 8px 16px; background: #333; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        button:disabled { background: #999; }
+        #error { color: red; margin-top: 10px; }
+        #results { margin-top: 30px; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; font-size: 13px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f4f4f4; }
+        pre { background: #f9f9f9; padding: 16px; overflow-x: auto; border: 1px solid #ddd; }
+        #downloadBtn { margin-top: 10px; background: #2a7ae2; }
+    </style>
+</head>
+<body>
+    <h1>PDF Extractor</h1>
+
+    <input type="file" id="fileInput" accept="application/pdf" />
+    <br />
+    <button id="uploadBtn" onclick="upload()">Extract</button>
+    <p id="error"></p>
+
+    <div id="results" style="display:none;">
+        <h2>Header</h2>
+        <table id="headerTable"></table>
+
+        <h2>Positions</h2>
+        <table id="positionsTable"></table>
+
+        <h2>JSON</h2>
+        <pre id="jsonOutput"></pre>
+
+        <button id="downloadBtn" onclick="download()">Download TXT</button>
+    </div>
+
+    <script>
+        let txtContent = "";
+
+        async function upload() {
+            const file = document.getElementById("fileInput").files[0];
+            const error = document.getElementById("error");
+            error.textContent = "";
+
+            if (!file) { error.textContent = "Please select a PDF file."; return; }
+
+            const btn = document.getElementById("uploadBtn");
+            btn.disabled = true;
+            btn.textContent = "Extracting...";
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const response = await fetch("/extract", { method: "POST", body: formData });
+                if (!response.ok) throw new Error("Extraction failed.");
+                const data = await response.json();
+
+                txtContent = data.txt;
+                renderHeader(data.result.header);
+                renderPositions(data.result.positions);
+                document.getElementById("jsonOutput").textContent = JSON.stringify(data.result, null, 2);
+                document.getElementById("results").style.display = "block";
+            } catch (e) {
+                error.textContent = e.message;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Extract";
+            }
+        }
+
+        function renderHeader(header) {
+            const table = document.getElementById("headerTable");
+            table.innerHTML = "<tr><th>Field</th><th>Value</th></tr>" +
+                Object.entries(header).map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("");
+        }
+
+        function renderPositions(positions) {
+            if (!positions.length) return;
+            const keys = Object.keys(positions[0]);
+            const table = document.getElementById("positionsTable");
+            table.innerHTML =
+                `<tr>${keys.map(k => `<th>${k}</th>`).join("")}</tr>` +
+                positions.map(p => `<tr>${Object.values(p).map(v => `<td>${v}</td>`).join("")}</tr>`).join("");
+        }
+
+        function download() {
+            const blob = new Blob([txtContent], { type: "text/plain" });
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "output.txt";
+            a.click();
+        }
+    </script>
+</body>
+</html>

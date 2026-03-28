@@ -1,6 +1,6 @@
 # PDF Extractor
 
-Extracts and maps data from roller shutter order PDFs using Gemini AI.
+Extracts and maps data from roller shutter order PDFs using Gemini API.
 
 ## Run with Docker
 ```bash

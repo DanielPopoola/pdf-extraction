@@ -4,8 +4,8 @@ Extracts and maps data from roller shutter order PDFs using Gemini AI.
 
 ## Run with Docker
 ```bash
-docker pull your-dockerhub-username/pdf-extractor
-docker run -e GEMINI_API_KEY=your_key -p 8000:8000 your-dockerhub-username/pdf-extractor
+docker pull iamuchihadaniel/pdf-extractor
+docker run -e GEMINI_API_KEY=your_key -p 8000:8000 iamuchihadaniel/pdf-extractor
 ```
 
 Then open http://localhost:8000 in your browser.

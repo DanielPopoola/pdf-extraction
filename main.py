@@ -73,8 +73,8 @@ POSITIONS (one row per table entry):
 - col4: Höhe value
 - col5: L column contains L = "1" else "0"
 - col6: R column contains R = "1" else "0"
-- col7: Antrieb cell contains Elektro AND header Antrieb contains IO = "1" | \ 
-		contains Elektro AND header contains SMI = "2" | else "0"
+- col7: Antrieb cell contains Elektro AND header \
+	  Antrieb contains IO = "1" | contains Elektro AND header contains SMI = "2" | else "0"
 - col8: POS value (e.g. EG1, DG4)
 - col9: Bemerkung → contains Notkurbel = "8" | contains Rolladenkasten = "Rolladenkasten" | else "0"
 - col10: Bemerkung number (e.g. 180mm) else "0"
